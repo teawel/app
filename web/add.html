@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Add instance</title>
+	<link rel="stylesheet" href="/css/semantic.min.css" type="text/css" media="all"/>
+	<link rel="stylesheet" href="/add.css" type="text/css" media="all"/>
+	<script src="/js/vue.min.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		window.TEA = { "ACTION": {"base":"", "data":{}, "module": "", "parent":"/"} };
+	</script>
+	<script src="/js/vue.tea.js" type="text/javascript"></script>
+	<script src="/add.js" type="text/javascript"></script>
+	<script src="/js/form.js" type="text/javascript"></script>
+</head>
+<body>
+
+<div class="main-box">
+	<form class="ui form" data-tea-action=".addSubmit" data-tea-success="submitSuccess">
+		<table class="ui table selectable definition">
+			<tr>
+				<td class="title">Name</td>
+				<td>
+					<input type="text" name="name" maxlength="100"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Refresh Interval</td>
+				<td>
+					<div class="ui fields inline">
+						<div class="ui field">
+							<input type="text" name="interval" size="8" maxlength="8" value="30"/>
+						</div>
+						<div class="ui field">
+							Seconds
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tbody v-if="options.length > 0">
+				<tr>
+					<td colspan="2">Options:</td>
+				</tr>
+				<tr v-for="option in options">
+					<td>{{option.title}}
+						<em v-if="option.subtitle.length > 0">({{option.subtitle}})</em>
+					</td>
+					<td>
+						<div v-html="option.html"></div>
+						<p class="comment" v-if="option.description.length > 0">{{option.description}}</p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<button type="submit" class="ui button primary">Save</button> &nbsp; <a href="/">Back</a>
+	</form>
+</div>
+
+</body>
+</html>

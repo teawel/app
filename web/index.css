@@ -1,0 +1,76 @@
+/** common **/
+.menu span.item {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/** index **/
+.main-box {
+
+}
+
+.main-box .top-nav {
+    margin-top: 0.5em;
+    height: 3em;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 10;
+}
+
+.main-box .left-box {
+    position: fixed;
+    left: 0;
+    right: 20em;
+    top: 3.5em;
+    bottom: 0;
+    padding: 1em;
+}
+
+.main-box .left-box .menu.text {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.main-box .left-box .divider {
+    margin-top: 0 !important;
+}
+
+.main-box .left-box .chart-box {
+
+}
+
+.main-box .left-box .chart-box {
+    position: relative;
+    float: left;
+    padding: 0 2px 0 2px;
+}
+
+.main-box .left-box .chart-box thead span {
+    position: absolute;
+    right: 1.6em;
+}
+
+.main-box .left-box .chart-box .canvas {
+    
+}
+
+.main-box .right-box {
+    width: 20em;
+    position: fixed;
+    right: 0;
+    top: 3.5em;
+    bottom: 0;
+    border-left: 1px rgba(0, 0, 0, 0.15) solid;
+    padding: 1em;
+    overflow-y: auto;
+}
+
+.main-box .right-box::-webkit-scrollbar {
+    width: 4px;
+}
+
+.main-box .right-box .table .title {
+    width: 2em;
+}
