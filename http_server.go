@@ -32,6 +32,15 @@ func NewHTTPServer(wel *Wel, address string) *HTTPServer {
 }
 
 func (this *HTTPServer) Start() error {
+	// validate
+	if len(this.wel.Id) == 0 {
+		return errors.New("wel id should not be empty")
+	}
+
+	if !regexp.MustCompile("^[a-zA-Z0-9.@-]+$").MatchString(this.wel.Id) {
+		return errors.New("wel id '" + this.wel.Id + "' is invalid")
+	}
+
 	// start fetching
 	this.startFetching(60 * time.Second)
 

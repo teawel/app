@@ -1,13 +1,19 @@
 package app
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
+	"github.com/go-yaml/yaml"
 	"github.com/teawel/app/lists"
 	"github.com/teawel/app/options"
 	"github.com/teawel/app/utils"
+	"github.com/vmihailenco/msgpack"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 )
 
@@ -139,34 +145,29 @@ func (this *Wel) ServeHTTP(address string) error {
 
 func (this *Wel) RunCmd(cmd string, args []string, writer io.Writer) error {
 	if lists.ContainsString([]string{"-h", "help", "--help", "?"}, cmd) {
+
 		utils.Println(`wel usage: 
    your-wel [OPTIONS]
 
-OPTIONS:
--h 
-   current help
-
--v 
-   wel version
-
-info 
-   wel information
-
-options
-   wel instance options
-
-all
-   wel all information, options, templates
-
-fetch -option1=value1 ...
-   fetch values
-
-run OPERATION -option1=value1 ...
-   run instance operation
-
-serve HOST:PORT
-   serve a http server`)
-		utils.Println()
+OPTIONS:`)
+		for _, cmd := range [][]string{
+			{"-h", "current help"},
+			{"-v", "wel version"},
+			{"info", "wel information"},
+			{"options", "wel instance options"},
+			{"all", "wel all information, options, templates"},
+			{"fetch -option1=value1 ...", "fetch values"},
+			{"run OPERATION -option1=value1 ...", "run instance operation"},
+			{"serve HOST:PORT", "serve a http server"},
+			{"export", "export wel configuration to YAML file"},
+			{"pipe", "open a pipe for fetching values"},
+		} {
+			if len(cmd[0]) < 8 {
+				fmt.Printf("%-12s %s\n", cmd[0], cmd[1])
+			} else {
+				fmt.Printf("%s\n   %s\n", cmd[0], cmd[1])
+			}
+		}
 	} else if lists.ContainsString([]string{"-v", "version"}, cmd) {
 		writer.Write([]byte(this.Name + " v" + this.Version))
 	} else if lists.ContainsString([]string{"info"}, cmd) {
@@ -230,18 +231,18 @@ serve HOST:PORT
 			return errors.New("operation handler should not be nil")
 		}
 
-		options := map[string]string{}
+		opts := map[string]string{}
 		if len(args) > 1 {
 			reg := regexp.MustCompile(`^(?:-*)(\w+)=`)
 			for _, arg := range args[1:] {
 				if reg.MatchString(arg) {
 					matches := reg.FindStringSubmatch(arg)
-					options[matches[1]] = arg[len(matches[0]):]
+					opts[matches[1]] = arg[len(matches[0]):]
 				}
 			}
 		}
 
-		result, err := handler(options)
+		result, err := handler(opts)
 		if err != nil {
 			return err
 		}
@@ -259,6 +260,75 @@ serve HOST:PORT
 
 		server := NewHTTPServer(this, address)
 		return server.Start()
+	} else if lists.ContainsString([]string{"export"}, cmd) {
+		if len(this.Id) == 0 {
+			return errors.New("wel id should not be empty")
+		}
+		data, err := yaml.Marshal(this)
+		if err != nil {
+			return err
+		}
+		exe, err := os.Executable()
+		if err != nil {
+			return err
+		}
+		return ioutil.WriteFile(filepath.Dir(exe)+"/"+this.Id+".yml", data, 0666)
+	} else if lists.ContainsString([]string{"pipe"}, cmd) {
+		reader := os.NewFile(uintptr(3), "parentReader")
+		if reader == nil {
+			return errors.New("reader should not be nil")
+		}
+
+		var writer *os.File
+		if !utils.IsTesting() {
+			writer = os.NewFile(uintptr(4), "parentWriter")
+			if writer == nil {
+				return errors.New("writer should not be nil")
+			}
+		} else {
+			// for testing
+			writer = os.NewFile(uintptr(7), "parentWriter")
+			if writer == nil {
+				return errors.New("writer should not be nil")
+			}
+		}
+
+		decoder := msgpack.NewDecoder(reader)
+		encoder := msgpack.NewEncoder(writer)
+
+		for {
+			cmd := new(CommandMsg)
+			err := decoder.Decode(cmd)
+			if err != nil {
+				if err != io.EOF && err != io.ErrUnexpectedEOF {
+					log.Println("[error]" + err.Error())
+				}
+				break
+			}
+
+			reply := new(ReplyMsg)
+			reply.Code = cmd.Code
+			reply.Id = cmd.Id
+
+			args := []string{}
+			for k, v := range cmd.Args {
+				args = append(args, k+"="+v)
+			}
+			output := bytes.NewBuffer([]byte{})
+			err = this.RunCmd(cmd.Code, args, output)
+			if err != nil {
+				reply.Error = err.Error()
+			} else {
+				reply.Result = string(output.Bytes())
+			}
+
+			err = encoder.Encode(reply)
+			if err != nil {
+				log.Println("[error]" + err.Error())
+			}
+		}
+
+		return nil
 	} else {
 		return errors.New("unknown command, use 'wel -h' to lookup usage")
 	}

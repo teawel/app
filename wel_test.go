@@ -4,10 +4,13 @@ import (
 	"github.com/teawel/app/charts"
 	"github.com/teawel/app/options"
 	"github.com/teawel/app/utils"
+	"github.com/vmihailenco/msgpack"
+	"log"
 	"math/rand"
 	"os"
 	"strconv"
 	"testing"
+	"time"
 )
 
 func TestWelCommandHelp(t *testing.T) {
@@ -308,4 +311,62 @@ func TestWel_ServeHTTP(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestWel_Pipe(t *testing.T) {
+	// fd: 3, 4
+	_, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// fd: 6, 7
+	r, _, err := os.Pipe()
+
+	go func() {
+		time.Sleep(1 * time.Second)
+		encoder := msgpack.NewEncoder(w)
+		encoder.Encode(&CommandMsg{
+			Id:   "123",
+			Code: "fetch",
+			Args: map[string]string{
+				"host": "127.0.0.1",
+			},
+		})
+	}()
+
+	go func() {
+		decoder := msgpack.NewDecoder(r)
+		for {
+			reply := new(ReplyMsg)
+			err := decoder.Decode(reply)
+			if err != nil {
+				t.Fatal(err)
+			}
+			log.Println("reply:", reply)
+		}
+	}()
+
+	wel := NewWel()
+	wel.OnFetch(func(options map[string]string) (result map[string]string, err error) {
+		return map[string]string{
+			"name": "lu",
+			"age":  "20",
+		}, nil
+	})
+	wel.Id = "mysql-test@teaos.cn"
+	t.Log(wel.RunCmd("pipe", []string{}, os.Stdout))
+}
+
+func TestWel_Export(t *testing.T) {
+	wel := NewWel()
+	wel.Id = "mysql"
+	wel.Version = "1.0"
+	wel.AddOption(options.NewStringOption("Host", "host"))
+	wel.AddOption(options.NewStringOption("Port", "port"))
+	err := wel.RunCmd("export", []string{}, os.Stdout)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("OK")
 }
