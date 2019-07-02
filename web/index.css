@@ -26,6 +26,11 @@
     top: 3.5em;
     bottom: 0;
     padding: 1em;
+    overflow-y: auto;
+}
+
+.main-box .left-box::-webkit-scrollbar {
+    width: 4px;
 }
 
 .main-box .left-box .menu.text {
@@ -35,25 +40,6 @@
 
 .main-box .left-box .divider {
     margin-top: 0 !important;
-}
-
-.main-box .left-box .chart-box {
-
-}
-
-.main-box .left-box .chart-box {
-    position: relative;
-    float: left;
-    padding: 0 2px 0 2px;
-}
-
-.main-box .left-box .chart-box thead span {
-    position: absolute;
-    right: 1.6em;
-}
-
-.main-box .left-box .chart-box .canvas {
-    
 }
 
 .main-box .right-box {

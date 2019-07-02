@@ -7,21 +7,21 @@ import (
 )
 
 type LineChart struct {
-	BasicChart
+	AxisChart `yaml:",inline" json:",inline"`
 
-	Lines    []*Line     `yaml:"lines" json:"lines"`
-	MaxValue interface{} `yaml:"maxValue" json:"maxValue"`
-	Labels   []string    `yaml:"labels" json:"labels"`
+	Series []*LineSeries `yaml:"series" json:"series"`
+	Labels []string      `yaml:"labels" json:"labels"`
 }
 
 func NewLineChart() *LineChart {
 	return &LineChart{
-		Lines: []*Line{},
+		Series: []*LineSeries{},
+		Labels: []string{},
 	}
 }
 
-func (this *LineChart) AddLine(line ...*Line) {
-	this.Lines = append(this.Lines, line...)
+func (this *LineChart) AddSeries(series ...*LineSeries) {
+	this.Series = append(this.Series, series...)
 }
 
 func (this *LineChart) Type() string {
@@ -29,7 +29,7 @@ func (this *LineChart) Type() string {
 }
 
 func (this *LineChart) Fetch(db *dbs.DB) error {
-	for lineIndex, line := range this.Lines {
+	for lineIndex, line := range this.Series {
 		values, err := db.Query([]string{utils.TimeFormat("Ymd")}, line.Query)
 		if err != nil {
 			log.Println("[error]" + err.Error())

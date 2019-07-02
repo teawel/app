@@ -14,8 +14,8 @@ func TestNewChart(t *testing.T) {
 
 	chart := charts.NewLineChart()
 	{
-		line := charts.NewLine()
-		chart.AddLine(line)
+		line := charts.NewLineSeries()
+		chart.AddSeries(line)
 	}
 	canvas.SetChart(chart)
 
@@ -33,7 +33,7 @@ func TestChart_Values(t *testing.T) {
 
 	chart := charts.NewLineChart()
 	{
-		line := charts.NewLine()
+		line := charts.NewLineSeries()
 		line.Query = `
 	filter(function (k, v) {
 		return true;
@@ -43,7 +43,7 @@ func TestChart_Values(t *testing.T) {
 	}).
 	result("name")
 `
-		chart.AddLine(line)
+		chart.AddSeries(line)
 	}
 
 	err = chart.Fetch(db)

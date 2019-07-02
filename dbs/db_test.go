@@ -63,6 +63,29 @@ result("name")
 	t.Log(string(utils.JSONEncodePretty(result)))
 }
 
+func TestDB_QueryResultArray(t *testing.T) {
+	db, err := NewDB(os.TempDir() + "test.db")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	result, err := db.Query([]string{utils.TimeFormat("Ymd")}, `
+map(function (k, v) {
+	v.value.name = "Hello";
+	return v;
+})
+.label(function() {
+	return ["Name", "Hello"];
+})
+.result(["name", "hello"])
+`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(string(utils.JSONEncodePretty(result)))
+}
+
 func TestOtto(t *testing.T) {
 	if scriptVM == nil {
 		t.Fatal("scriptVM should not be nil")

@@ -6,6 +6,10 @@ type HTMLChart struct {
 	HTML string `yaml:"html" json:"html"`
 }
 
+func NewHTMLChart() *HTMLChart {
+	return &HTMLChart{}
+}
+
 func (this *HTMLChart) Type() string {
 	return TypeHTML
 }

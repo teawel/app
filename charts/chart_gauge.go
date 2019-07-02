@@ -3,11 +3,17 @@ package charts
 type GaugeChart struct {
 	BasicChart
 
-	Value float64 `yaml:"value" json:"value"`
-	Label string  `yaml:"label" json:"label"`
-	Min   float64 `yaml:"min" json:"min"`
-	Max   float64 `yaml:"max" json:"max"`
-	Unit  string  `yaml:"unit" json:"unit"`
+	Series []*GaugeSeries `yaml:"series" json:"series"`
+}
+
+func NewGaugeChart() *GaugeChart {
+	return &GaugeChart{
+		Series: []*GaugeSeries{},
+	}
+}
+
+func (this *GaugeChart) AddSeries(series *GaugeSeries) {
+	this.Series = append(this.Series, series)
 }
 
 func (this *GaugeChart) Type() string {

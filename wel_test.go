@@ -260,34 +260,350 @@ func TestWel_ServeHTTP(t *testing.T) {
 		canvas := NewChartCanvas("cpu_usage", "CPU Usage", CanvasHalf, CanvasFull)
 		chart := charts.NewLineChart()
 		{
-			line := charts.NewLine()
+			line := charts.NewLineSeries()
 			line.Query = `result("usage")`
-			chart.AddLine(line)
+			chart.AddSeries(line)
 		}
 		{
-			line := charts.NewLine()
+			line := charts.NewLineSeries()
 			line.Query = `result("usage3")`
-			chart.AddLine(line)
+			chart.AddSeries(line)
 		}
 		canvas.SetChart(chart)
-		wel.AddChart(canvas)
+		wel.AddChartCanvas(canvas)
 	}
 
 	{
 		canvas := NewChartCanvas("memory_usage", "Memory Usage", CanvasHalf, CanvasFull)
 		chart := charts.NewLineChart()
 		{
-			line := charts.NewLine()
+			line := charts.NewLineSeries()
 			line.Query = `result("usage2")`
-			chart.AddLine(line)
+			chart.AddSeries(line)
 		}
 		canvas.SetChart(chart)
-		wel.AddChart(canvas)
+		wel.AddChartCanvas(canvas)
 	}
 
 	{
-		dashboard := NewDefaultDashboard("1.0.1")
-		wel.AddChartsToDashboard(dashboard, "cpu_usage", "memory_usage")
+		canvas := NewChartCanvas("single_value", "Single Value", CanvasHalf, CanvasFull)
+		chart := charts.NewValueChart()
+		//chart.Value = charts.NewValue(1024, "LABEL")
+		chart.ValueColor = "red"
+		chart.LabelColor = "blue"
+		chart.Query = `label(function () {
+	return "LABEL";
+}).result("usage")`
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}
+
+	/**{
+		canvas := NewChartCanvas("chart_url", "URL Chart", CanvasHalf, CanvasFull)
+		chart := charts.NewURLChart()
+		chart.URL = "http://teaos.cn"
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}**/
+
+	{
+		canvas := NewChartCanvas("chart_html", "HTML Chart", CanvasHalf, CanvasFull)
+		chart := charts.NewHTMLChart()
+		chart.HTML = "<strong>THIS IS <span style=\"color:red\">H</span><span style=\"color:blue\">T</span>ML</strong>"
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}
+
+	// pie
+	{
+		canvas := NewChartCanvas("chart_pie", "Pie Chart", CanvasHalf, CanvasFull)
+		chart := charts.NewPieChart()
+		{
+			series := charts.NewPieSeries()
+			series.Query = `label(function (k, v) {
+	return ["Usage", "Usage2", "Usage3"];
+}).result(["usage", "usage2", "usage3"])`
+			chart.AddSeries(series)
+		}
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}
+
+	// clock
+	{
+		canvas := NewChartCanvas("chart_clock", "Clock Chart", CanvasHalf, CanvasFull)
+		chart := charts.NewClockChart()
+		chart.Timestamp = time.Now().Unix()
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}
+
+	// radar
+	{
+		canvas := NewChartCanvas("chart_radar", "Radar Chart", CanvasHalf, CanvasFull)
+		chart := charts.NewRadarChart()
+		chart.AddCategory(charts.NewRadarCategory("Sales", 10000))
+		chart.AddCategory(charts.NewRadarCategory("Administration", 10000))
+		chart.AddCategory(charts.NewRadarCategory("Information", 10000))
+		chart.AddCategory(charts.NewRadarCategory("Customer", 10000))
+		chart.AddCategory(charts.NewRadarCategory("Marketing", 10000))
+
+		series := charts.NewRadarSeries()
+		{
+			subCategory := charts.NewRadarSubCategory("Budget")
+			subCategory.Values = []float64{4000, 5000, 6000, 7000, 6500}
+			series.AddSubCategory(subCategory)
+		}
+
+		{
+			subCategory := charts.NewRadarSubCategory("Spending")
+			subCategory.Values = []float64{3500, 4600, 5000, 3000, 6000}
+			series.AddSubCategory(subCategory)
+		}
+
+		chart.AddSeries(series)
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}
+
+	// funnel
+	{
+		canvas := NewChartCanvas("chart_funnel", "Funnel Chart", CanvasHalf, CanvasFull)
+		chart := charts.NewFunnelChart()
+		series := charts.NewFunnelSeries()
+		series.AddValue(60, "Visiting")
+		series.AddValue(40, "Consulting")
+		series.AddValue(20, "Order")
+		series.AddValue(80, "Clicking")
+		series.AddValue(100, "Display")
+		chart.AddSeries(series)
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}
+
+	// scatter
+	{
+		canvas := NewChartCanvas("chart_scatter", "Scatter Chart", CanvasHalf, CanvasFull)
+		chart := charts.NewScatterChart()
+
+		{
+			series := charts.NewScatterSeries()
+			series.AddValue(60, "Visiting")
+			series.AddValue(40, "Consulting")
+			series.AddValue(20, "Order")
+			series.AddValue(80, "Clicking")
+			series.AddValue(100, "Display")
+			series.Size = "20"
+			chart.AddSeries(series)
+		}
+
+		{
+			series := charts.NewScatterSeries()
+			series.AddValue(50, "Visiting")
+			series.AddValue(45, "Consulting")
+			series.AddValue(23, "Order")
+			series.AddValue(8, "Clicking")
+			series.AddValue(53, "Display")
+			series.Size = charts.NewFuncString(`function (value) {
+	return value.value / 3;
+}`)
+			chart.AddSeries(series)
+		}
+
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}
+
+	// bar
+	{
+		canvas := NewChartCanvas("chart_bar", "Bar Chart", CanvasHalf, CanvasFull)
+		chart := charts.NewBarChart()
+		{
+			series := charts.NewBarSeries()
+			series.AddValue("10", "PHP")
+			series.AddValue("20", "Java")
+			series.AddValue("30", "Python")
+			series.AddValue("25", "Golang")
+			series.AddValue("15", "Perl")
+			series.Width = "20"
+			chart.AddSeries(series)
+		}
+		{
+			series := charts.NewBarSeries()
+			series.AddValue("18", "PHP")
+			series.AddValue("22", "Java")
+			series.AddValue("38", "Python")
+			series.AddValue("20", "Golang")
+			series.AddValue("19", "Perl")
+			chart.AddSeries(series)
+		}
+		chart.Labels = []string{"PHP", "Java", "Python", "Golang", "Perl"}
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}
+
+	// stack bar
+	{
+		canvas := NewChartCanvas("chart_stack_bar", "Stack Bar Chart", CanvasHalf, CanvasFull)
+		chart := charts.NewBarChart()
+
+		axis := charts.NewAxis()
+		axis.Reverse = true
+		axis.X.Max = 100
+		axis.X.Name = "Usage"
+		axis.Y.Name = "Disk"
+		chart.Axis = axis
+
+		{
+			series := charts.NewBarSeries()
+			series.Name = "Size"
+			series.AddValue("10", "C:")
+			series.AddValue("20", "D:")
+			series.AddValue("30", "E:")
+			series.Stack = "usage"
+			chart.AddSeries(series)
+		}
+		{
+			series := charts.NewBarSeries()
+			series.Name = "Used"
+			series.AddValue("8", "C:")
+			series.AddValue("18", "D:")
+			series.AddValue("15", "E:")
+			series.Stack = "usage"
+			chart.AddSeries(series)
+		}
+		chart.Labels = []string{"C:", "D:", "E:"}
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}
+
+	// gauge
+	{
+		canvas := NewChartCanvas("chart_gauge", "Gauge", CanvasHalf, CanvasFull)
+		chart := charts.NewGaugeChart()
+		{
+			series := charts.NewGaugeSeries()
+			series.AddValue(100, "km/h")
+			series.Min = 10
+			series.Max = 200
+			series.Radius = "70%"
+			series.Center = charts.NewPosition("50%", "50%")
+
+			axisLine := charts.NewAxisLine()
+			axisLine.Width = 5
+			series.AxisLine = axisLine
+
+			axisTick := charts.NewAxisTick()
+			axisTick.Length = 10
+			//axisTick.Color = "red"
+			//axisTick.Width = 10
+			series.AxisTick = axisTick
+
+			splitLine := charts.NewSplitLine()
+			splitLine.Length = 10
+			series.SplitLine = splitLine
+
+			series.SplitNumber = 5
+
+			pointer := charts.NewPointer()
+			pointer.Length = "80%"
+			pointer.Width = 2
+			series.Pointer = pointer
+
+			series.Detail = charts.NewFuncString(`
+function (value) {
+	return value + '(Speed)';
+}
+`)
+
+			detailStyle := charts.NewTextStyle()
+			detailStyle.FontSize = 10
+			series.DetailStyle = detailStyle
+
+			chart.AddSeries(series)
+		}
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}
+
+	// table
+	{
+		canvas := NewChartCanvas("chart_table", "Table", CanvasHalf, CanvasFull)
+
+		table := charts.NewTableChart()
+		table.AddDefaultCol()
+		table.AddDefaultCol()
+
+		{
+			col := charts.NewTableCol()
+			col.Header = "Location"
+			col.Width = "10em"
+			table.AddCol(col)
+		}
+
+		table.AddRowValues("lu", "20", "Beijing")
+		table.AddRowValues("ping", "21", "Shanghai")
+		table.AddRowValues("wei", "22", "Shenzhen")
+		table.AddRowValues("yin", "21", "Nanjing")
+		table.AddRowValues("feng", "25", "Wuxi")
+
+		canvas.SetChart(table)
+		wel.AddChartCanvas(canvas)
+	}
+
+	// echart
+	{
+		canvas := NewChartCanvas("chart_echart", "EChart", CanvasHalf, CanvasFull)
+		chart := charts.NewEchart()
+		chart.Code = `var data = [];
+
+for (var i = 0; i <= 360; i++) {
+    var t = i / 180 * Math.PI;
+    var r = Math.sin(2 * t) * Math.cos(2 * t);
+    data.push([r, i]);
+}
+
+var option = {
+    title: {
+        text: ''
+    },
+    legend: {
+        data: ['line']
+    },
+    polar: {
+        center: ['50%', '54%']
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+            type: 'cross'
+        }
+    },
+    angleAxis: {
+        type: 'value',
+        startAngle: 0
+    },
+    radiusAxis: {
+        min: 0
+    },
+    series: [{
+        coordinateSystem: 'polar',
+        name: 'line',
+        type: 'line',
+        showSymbol: false,
+        data: data
+    }],
+    animationDuration: 2000
+};
+chart.setOption(option);
+`
+		canvas.SetChart(chart)
+		wel.AddChartCanvas(canvas)
+	}
+
+	{
+		dashboard := NewDefaultDashboard("1.0.25")
+		wel.AddAllChartsToDashboard(dashboard)
 		wel.AddDashboard(dashboard)
 	}
 

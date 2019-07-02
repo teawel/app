@@ -5,20 +5,19 @@ import "encoding/json"
 type Type = string
 
 const (
-	TypeValue    = "value"
-	TypeLine     = "line"
-	TypePie      = "pie"
-	TypeBar      = "bar"
-	TypeStackBar = "stackBar"
-	TypeFunnel   = "funnel"
-	TypeRadar    = "radar"
-	TypeScatter  = "scatter"
-	TypeGauge    = "gauge"
-	TypeEchart   = "echart"
-	TypeTable    = "table"
-	TypeClock    = "clock"
-	TypeURL      = "url"
-	TypeHTML     = "html"
+	TypeValue   = "value"
+	TypeLine    = "line"
+	TypePie     = "pie"
+	TypeBar     = "bar"
+	TypeFunnel  = "funnel"
+	TypeRadar   = "radar"
+	TypeScatter = "scatter"
+	TypeGauge   = "gauge"
+	TypeEchart  = "echart"
+	TypeTable   = "table"
+	TypeClock   = "clock"
+	TypeURL     = "url"
+	TypeHTML    = "html"
 )
 
 func Decode(chartType Type, options string) (ChartInterface, error) {
@@ -32,8 +31,6 @@ func Decode(chartType Type, options string) (ChartInterface, error) {
 		chart = new(PieChart)
 	case TypeBar:
 		chart = new(BarChart)
-	case TypeStackBar:
-		chart = new(StackBarChart)
 	case TypeFunnel:
 		chart = new(FunnelChart)
 	case TypeRadar:

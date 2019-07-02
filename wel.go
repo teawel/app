@@ -73,8 +73,8 @@ func (this *Wel) AddThreshold(thresholdTemplate *Threshold) {
 	this.ThresholdTemplates = append(this.ThresholdTemplates, thresholdTemplate)
 }
 
-func (this *Wel) AddChart(chart *ChartCanvas) {
-	this.ChartTemplates = append(this.ChartTemplates, chart)
+func (this *Wel) AddChartCanvas(canvas *ChartCanvas) {
+	this.ChartTemplates = append(this.ChartTemplates, canvas)
 }
 
 func (this *Wel) FindChart(chartId string) *ChartCanvas {
@@ -100,6 +100,12 @@ func (this *Wel) AddChartsToDashboard(dashboard *Dashboard, chartId ...string) {
 			log.Println("[error]can not find chart with id '" + chartId2 + "'")
 			continue
 		}
+		dashboard.AddChart(chart)
+	}
+}
+
+func (this *Wel) AddAllChartsToDashboard(dashboard *Dashboard) {
+	for _, chart := range this.ChartTemplates {
 		dashboard.AddChart(chart)
 	}
 }
@@ -156,16 +162,16 @@ OPTIONS:`)
 			{"info", "wel information"},
 			{"options", "wel instance options"},
 			{"all", "wel all information, options, templates"},
+			{"export", "export wel configuration to YAML file"},
+			{"pipe", "open a pipe for fetching values"},
 			{"fetch -option1=value1 ...", "fetch values"},
 			{"run OPERATION -option1=value1 ...", "run instance operation"},
 			{"serve HOST:PORT", "serve a http server"},
-			{"export", "export wel configuration to YAML file"},
-			{"pipe", "open a pipe for fetching values"},
 		} {
 			if len(cmd[0]) < 8 {
 				fmt.Printf("%-12s %s\n", cmd[0], cmd[1])
 			} else {
-				fmt.Printf("%s\n   %s\n", cmd[0], cmd[1])
+				fmt.Printf("\n%s\n   %s\n", cmd[0], cmd[1])
 			}
 		}
 	} else if lists.ContainsString([]string{"-v", "version"}, cmd) {
@@ -272,7 +278,12 @@ OPTIONS:`)
 		if err != nil {
 			return err
 		}
-		return ioutil.WriteFile(filepath.Dir(exe)+"/"+this.Id+".yml", data, 0666)
+		err = ioutil.WriteFile(filepath.Dir(exe)+"/"+this.Id+".yml", data, 0666)
+		if err != nil {
+			return err
+		}
+		writer.Write([]byte("'" + this.Id + ".yml' generated\n"))
+		return nil
 	} else if lists.ContainsString([]string{"pipe"}, cmd) {
 		reader := os.NewFile(uintptr(3), "parentReader")
 		if reader == nil {

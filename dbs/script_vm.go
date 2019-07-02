@@ -59,10 +59,21 @@ function Query(records) {
 				}
 				v["$label"] = hour + ":" + minutes;
 			}
-			return {
-				"value": v.value[name],
-				"label": v["$label"]
-			};
+			if (name instanceof Array) {
+				var resultValues = [];
+				name.forEach(function (field) {
+					resultValues.push(v.value[field]);
+				});
+				return {
+					"value": resultValues,
+					"label": v["$label"]
+				};
+			} else {
+				return {
+					"value": v.value[name],
+					"label": v["$label"]
+				};
+			}
 		});
 	};
 }

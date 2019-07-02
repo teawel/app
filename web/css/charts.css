@@ -1,0 +1,35 @@
+.dashboard {
+
+}
+
+.dashboard .clear {
+    clear: both;
+}
+
+.chart-box {
+    position: relative;
+    float: left;
+    padding: 0 2px 10px 2px;
+}
+
+.chart-box thead span {
+    position: absolute;
+    right: 1.6em;
+}
+
+.chart-box .canvas {
+    position: relative;
+    overflow-y: auto;
+}
+
+.chart-box .canvas::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chart-box .canvas .single-value {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: 50%;
+    margin-top: -3em;
+}
