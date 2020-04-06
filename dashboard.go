@@ -19,9 +19,18 @@ func NewDefaultDashboard(version string) *Dashboard {
 	return NewDashboard("default", version, "Default")
 }
 
-func (this *Dashboard) AddChart(chart *ChartCanvas) {
-	if chart == nil {
+func (this *Dashboard) FindChart(canvasId string) *ChartCanvas {
+	for _, canvas := range this.Charts {
+		if canvas.Id == canvasId {
+			return canvas
+		}
+	}
+	return nil
+}
+
+func (this *Dashboard) AddChart(canvas *ChartCanvas) {
+	if canvas == nil {
 		return
 	}
-	this.Charts = append(this.Charts, chart)
+	this.Charts = append(this.Charts, canvas)
 }

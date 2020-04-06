@@ -70,13 +70,8 @@ Tea.context(function () {
 			})
 			.success(function (resp) {
 				var dashboard = resp.data;
-				var that = this;
 				dashboard.charts.$each(function (k, canvas) {
-					var box = that.$find("#chart-box-" + canvas.id + " .canvas");
-					box[0].style.height = (canvas.heightPercent * 180 * window.innerWidth / 1024) + "px";
-					that.$delay(function () {
-						renderChart(box[0], canvas);
-					});
+					chartRenderCanvas(canvas);
 				});
 			});
 	};

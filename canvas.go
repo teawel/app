@@ -12,6 +12,7 @@ const (
 	CanvasFull    = 1    // 1/1
 )
 
+// chart canvas
 type ChartCanvas struct {
 	Id          string                `yaml:"id" json:"id"`
 	Name        string                `yaml:"name" json:"name"`
@@ -21,6 +22,9 @@ type ChartCanvas struct {
 
 	WidthPercent  float32 `yaml:"widthPercent" json:"widthPercent"`
 	HeightPercent float32 `yaml:"heightPercent" json:"heightPercent"`
+
+	LeftMenu  *charts.Menu `yaml:"leftMenu" json:"leftMenu"`
+	RightMenu *charts.Menu `yaml:"rightMenu" json:"rightMenu"`
 }
 
 func NewChartCanvas(id string, name string, widthPercent float32, heightPercent float32) *ChartCanvas {
@@ -35,6 +39,23 @@ func NewChartCanvas(id string, name string, widthPercent float32, heightPercent 
 func (this *ChartCanvas) SetChart(chart charts.ChartInterface) {
 	this.Type = chart.Type()
 	this.OptionsJSON = string(utils.JSONEncode(chart))
+}
+
+func (this *ChartCanvas) SetParam(param *charts.Param) {
+	if param == nil {
+		return
+	}
+	if param.MenuParam != nil && param.MenuParam.HasItems() {
+		if this.LeftMenu != nil {
+			this.LeftMenu.SelectItem(param.MenuParam.ItemIds ...)
+		}
+		if this.RightMenu != nil {
+			this.RightMenu.SelectItem(param.MenuParam.ItemIds ...)
+		}
+	}
+	if this.Chart != nil {
+		this.Chart.SetParam(param)
+	}
 }
 
 func (this *ChartCanvas) Fetch(db *dbs.DB) error {

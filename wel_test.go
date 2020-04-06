@@ -607,6 +607,41 @@ chart.setOption(option);
 		wel.AddDashboard(dashboard)
 	}
 
+	{
+		dashboard := NewDashboard("menu", "1.0", "Menu")
+
+		{
+			canvas := NewChartCanvas("single_value", "Single Value", CanvasFull, CanvasFull)
+
+			{
+				menu := charts.NewMenu()
+				menu.AddItem(charts.NewMenuItem("kb", "KB"))
+				menu.AddItem(charts.NewMenuItem("mb", "MB"))
+				menu.AddItem(charts.NewMenuItem("gb", "GB"))
+				menu.SelectItem("kb")
+				canvas.LeftMenu = menu
+			}
+
+			{
+				menu := charts.NewMenu()
+				menu.AddItem(charts.NewMenuItem("hourly", "Hourly"))
+				menu.AddItem(charts.NewMenuItem("daily", "Daily"))
+				menu.AddItem(charts.NewMenuItem("weekly", "Weekly"))
+				menu.AddItem(charts.NewMenuItem("monthly", "Monthly"))
+				menu.SelectItem("hourly")
+				canvas.RightMenu = menu
+			}
+
+			chart := charts.NewValueChart()
+			chart.Value = charts.NewValue("1024", "KB")
+			canvas.SetChart(chart)
+
+			dashboard.AddChart(canvas)
+		}
+
+		wel.AddDashboard(dashboard)
+	}
+
 	wel.OnFetch(func(options map[string]string) (result map[string]string, err error) {
 		res := map[string]string{
 			"hello":  "World",

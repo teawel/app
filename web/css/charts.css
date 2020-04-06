@@ -17,6 +17,17 @@
     right: 1.6em;
 }
 
+.chart-box .menu-box td {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.chart-box .menu-box .menu {
+}
+
+.chart-box .menu-box .menu span.item {
+}
+
 .chart-box .canvas {
     position: relative;
     overflow-y: auto;

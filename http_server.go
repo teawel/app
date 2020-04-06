@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/teawel/app/charts"
 	"github.com/teawel/app/dbs"
 	"github.com/teawel/app/lists"
 	"github.com/teawel/app/types"
@@ -114,6 +115,8 @@ func (this *HTTPServer) handleIndex(writer http.ResponseWriter, request *http.Re
 		this.handleInstanceUpdate(writer, request)
 	} else if path == "/dashboard" {
 		this.handleDashboard(writer, request)
+	} else if path == "/canvas" {
+		this.handleCanvas(writer, request)
 	} else {
 		if !strings.Contains(filepath.Base(path), ".") {
 			path += ".html"
@@ -423,6 +426,70 @@ func (this *HTTPServer) handleDashboard(writer http.ResponseWriter, request *htt
 	}
 
 	this.writeResponse(writer, 200, "", dashboard)
+}
+
+func (this *HTTPServer) handleCanvas(writer http.ResponseWriter, request *http.Request) {
+	query := request.URL.Query()
+	instanceId := query.Get("instance")
+	dashboardId := query.Get("dashboard")
+	canvasId := query.Get("canvas")
+	param := query.Get("param")
+	if len(instanceId) == 0 {
+		this.writeResponse(writer, 400, "'instance' parameter should not be empty", nil)
+		return
+	}
+	if len(dashboardId) == 0 {
+		this.writeResponse(writer, 400, "'dashboard' parameter should not be empty", nil)
+		return
+	}
+	if len(canvasId) == 0 {
+		this.writeResponse(writer, 400, "'canvas' parameter should not be empty", nil)
+		return
+	}
+
+	instance, err := LoadInstanceFromPath(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yml")
+	if err != nil {
+		this.writeResponse(writer, 400, err.Error(), nil)
+		return
+	}
+
+	dashboard := instance.FindDashboard(dashboardId)
+	if dashboard == nil {
+		this.writeResponse(writer, 400, "can not find dashboard with id '"+dashboardId+"'", nil)
+		return
+	}
+
+	canvas := dashboard.FindChart(canvasId)
+	if canvas == nil {
+		this.writeResponse(writer, 400, "can not find chart canvas with id '"+canvasId+"'", nil)
+		return
+	}
+
+	if len(param) > 0 {
+		chartParam := charts.NewParam()
+		err = json.Unmarshal([]byte(param), chartParam)
+		if err != nil {
+			this.writeResponse(writer, 400, err.Error(), nil)
+			return
+		}
+
+		canvas.SetParam(chartParam)
+	}
+
+	chart, err := charts.Decode(canvas.Type, canvas.OptionsJSON)
+	if err != nil {
+		this.writeResponse(writer, 400, err.Error(), nil)
+		return
+	}
+	canvas.Chart = chart
+
+	err = canvas.Fetch(nil)
+	if err != nil {
+		this.writeResponse(writer, 400, err.Error(), nil)
+		return
+	}
+
+	this.writeResponse(writer, 200, "", canvas)
 }
 
 func (this *HTTPServer) retrieveInstances() (instances []map[string]interface{}, err error) {

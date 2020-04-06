@@ -34,11 +34,11 @@
 		</div>
 		<div class="ui divider" v-if="currentDashboard != null"></div>
 		<div class="dashboard" v-if="currentDashboard != null">
-			<div class="chart-box" v-for="chart in currentDashboard.charts" :style="{width:chart.widthPercent * 100 + '%'}" :id="'chart-box-' + chart.id">
+			<div class="chart-box" v-for="canvas in currentDashboard.charts" :style="{width:canvas.widthPercent * 100 + '%'}" :id="'chart-box-' + canvas.id">
 				<table class="ui table small">
 					<thead>
 						<tr>
-							<th>{{chart.name}}
+							<th colspan="2">{{canvas.name}}
 								<span>
 									<a href="" title="Date" @click.prevent="notImplement"><i class="icon clock small disabled"></i> </a>
 									<a href="" title="Setting" @click.prevent="notImplement"><i class="icon setting small disabled"></i></a>
@@ -47,8 +47,23 @@
 							</th>
 						</tr>
 					</thead>
+					<tbody v-if="canvas.leftMenu != null || canvas.rightMenu != null">
+						<tr class="menu-box">
+							<td>
+								<div v-if="canvas.leftMenu != null && canvas.leftMenu.items != null" class="ui menu text blue small">
+									<a href="" class="item" v-for="item in canvas.leftMenu.items" :class="{active:item.isActive}" @click.prevent="selectChartMenuItem(canvas, item)">{{item.name}}</a>
+								</div>
+							</td>
+							<td>
+								<div v-if="canvas.rightMenu != null && canvas.rightMenu.items != null" class="ui menu text blue small">
+									<span class="item right"></span>
+									<a href="" class="item" v-for="item in canvas.rightMenu.items" :class="{active:item.isActive}" @click.prevent="selectChartMenuItem(canvas, item)">{{item.name}}</a>
+								</div>
+							</td>
+						</tr>
+					</tbody>
 					<tr>
-						<td>
+						<td colspan="2">
 							<div class="canvas"></div>
 						</td>
 					</tr>

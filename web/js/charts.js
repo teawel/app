@@ -306,7 +306,6 @@ function renderChartGauge(box, chart) {
 }
 
 function renderChartTable(box, chart) {
-	console.log(JSON.stringify(chart, "", "  "));
 	var table = "<table class=\"ui table\">";
 	if (chart.cols != null) {
 		var header = "";
@@ -436,6 +435,83 @@ function renderChartHtml(box, chart) {
 	box.innerHTML = chart.html;
 }
 
+/**
+ * Menu
+ */
+function selectChartMenuItem(canvas, item) {
+	if (canvas.leftMenu != null) {
+		if (canvas.leftMenu.items.$exist(function (k, item2) {
+			return item2.id == item.id
+		})) {
+			canvas.leftMenu.items.$each(function (k, item2) {
+				item2.isActive = (item2.id == item.id);
+			});
+		}
+	}
+	if (canvas.rightMenu != null) {
+		if (canvas.rightMenu.items.$exist(function (k, item2) {
+			return item2.id == item.id
+		})) {
+			canvas.rightMenu.items.$each(function (k, item2) {
+				item2.isActive = (item2.id == item.id);
+			});
+		}
+	}
+
+	chartRefreshCanvas(canvas);
+}
+
+function chartRefreshCanvas(canvas) {
+	var param = {
+		"menuParam": {
+			"itemIds": []
+		},
+		"timeParam": {}
+	};
+
+	if (canvas.leftMenu != null) {
+		param.menuParam.itemIds.$pushAll(canvas.leftMenu.items.$filter(function (k, v) {
+			return v.isActive;
+		}).$map(function (k, v) {
+			return v.id;
+		}));
+	}
+	if (canvas.rightMenu != null) {
+		param.menuParam.itemIds.$pushAll(canvas.rightMenu.items.$filter(function (k, v) {
+			return v.isActive;
+		}).$map(function (k, v) {
+			return v.id;
+		}));
+	}
+
+	var that = Tea.Vue;
+	that.$get("/canvas")
+		.params({
+			"instance": that.currentInstance.id,
+			"dashboard": that.currentDashboard.id,
+			"canvas": canvas.id,
+			"param": JSON.stringify(param)
+		})
+		.success(function (resp) {
+			var canvas = resp.data;
+			that.currentDashboard.charts.$each(function (k, canvas2) {
+				if (canvas2.id == canvas.id) {
+					that.currentDashboard.charts[k] = canvas;
+					Vue.set(that.currentDashboard.charts, k, canvas);
+				}
+			});
+			chartRenderCanvas(canvas);
+		});
+}
+
+function chartRenderCanvas(canvas) {
+	var that = Tea.Vue;
+	var box = that.$find("#chart-box-" + canvas.id + " .canvas");
+	box[0].style.height = (canvas.heightPercent * 180 * window.innerWidth / 1024) + "px";
+	that.$delay(function () {
+		renderChart(box[0], canvas);
+	});
+}
 
 /**
  * utils
