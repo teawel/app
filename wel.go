@@ -278,11 +278,11 @@ OPTIONS:`)
 		if err != nil {
 			return err
 		}
-		err = ioutil.WriteFile(filepath.Dir(exe)+"/"+this.Id+".yml", data, 0666)
+		err = ioutil.WriteFile(filepath.Dir(exe)+"/"+this.Id+".yaml", data, 0666)
 		if err != nil {
 			return err
 		}
-		writer.Write([]byte("'" + this.Id + ".yml' generated\n"))
+		writer.Write([]byte("'" + this.Id + ".yaml' generated\n"))
 		return nil
 	} else if lists.ContainsString([]string{"pipe"}, cmd) {
 		reader := os.NewFile(uintptr(3), "parentReader")

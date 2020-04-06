@@ -322,7 +322,7 @@ func (this *HTTPServer) handleAddSubmit(writer http.ResponseWriter, request *htt
 
 	instanceId := utils.TimeFormat("YmdHis")
 	instance.Id = instanceId
-	err = instance.Write(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yml")
+	err = instance.Write(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yaml")
 	if err != nil {
 		this.writeResponse(writer, 400, "ERROR: "+err.Error(), nil)
 		return
@@ -352,7 +352,7 @@ func (this *HTTPServer) handleInstances(writer http.ResponseWriter, request *htt
 func (this *HTTPServer) handleInstance(writer http.ResponseWriter, request *http.Request) {
 	instanceId := request.URL.Query().Get("instance")
 
-	instance, err := LoadInstanceFromPath(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yml")
+	instance, err := LoadInstanceFromPath(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yaml")
 	if err != nil {
 		this.writeResponse(writer, 400, "ERROR: "+err.Error(), nil)
 		return
@@ -368,7 +368,7 @@ func (this *HTTPServer) handleInstance(writer http.ResponseWriter, request *http
 func (this *HTTPServer) handleInstanceUpdate(writer http.ResponseWriter, request *http.Request) {
 	instanceId := request.URL.Query().Get("instance")
 
-	instance, err := LoadInstanceFromPath(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yml")
+	instance, err := LoadInstanceFromPath(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yaml")
 	if err != nil {
 		this.writeResponse(writer, 400, err.Error(), nil)
 		return
@@ -378,7 +378,7 @@ func (this *HTTPServer) handleInstanceUpdate(writer http.ResponseWriter, request
 	instance.Operations = this.wel.Operations
 	instance.Charts = this.wel.ChartTemplates
 	instance.Thresholds = this.wel.ThresholdTemplates
-	err = instance.Write(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yml")
+	err = instance.Write(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yaml")
 	if err != nil {
 		this.writeResponse(writer, 400, err.Error(), nil)
 		return
@@ -399,7 +399,7 @@ func (this *HTTPServer) handleDashboard(writer http.ResponseWriter, request *htt
 		return
 	}
 
-	instance, err := LoadInstanceFromPath(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yml")
+	instance, err := LoadInstanceFromPath(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yaml")
 	if err != nil {
 		this.writeResponse(writer, 400, err.Error(), nil)
 		return
@@ -447,7 +447,7 @@ func (this *HTTPServer) handleCanvas(writer http.ResponseWriter, request *http.R
 		return
 	}
 
-	instance, err := LoadInstanceFromPath(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yml")
+	instance, err := LoadInstanceFromPath(Root + "/web/instances/" + this.wel.Id + "/" + instanceId + ".yaml")
 	if err != nil {
 		this.writeResponse(writer, 400, err.Error(), nil)
 		return
@@ -499,7 +499,7 @@ func (this *HTTPServer) retrieveInstances() (instances []map[string]interface{},
 	}
 
 	dir := Root + "/web/instances/" + this.wel.Id + "/"
-	result, err := filepath.Glob(dir + "/*.yml")
+	result, err := filepath.Glob(dir + "/*.yaml")
 	if err != nil {
 		return
 	}
@@ -507,7 +507,7 @@ func (this *HTTPServer) retrieveInstances() (instances []map[string]interface{},
 	instances = []map[string]interface{}{}
 	for _, file := range result {
 		filename := filepath.Base(file)
-		if !regexp.MustCompile(`^\d+.yml$`).MatchString(filename) {
+		if !regexp.MustCompile(`^\d+.yaml`).MatchString(filename) {
 			log.Println("[error]skip '" + filename + "': invalid filename")
 			continue
 		}
