@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type StringOption struct {
+type TextField struct {
 	Option `yaml:",inline"`
 
 	MaxLength   int    `yaml:"maxLength" json:"maxLength"`
@@ -15,8 +15,8 @@ type StringOption struct {
 	RightLabel  string `yaml:"rightLabel" json:"rightLabel"`
 }
 
-func NewStringOption(title string, code string) *StringOption {
-	return &StringOption{
+func NewTextField(title string, code string) *TextField {
+	return &TextField{
 		Option: Option{
 			Type:  "string",
 			Title: title,
@@ -25,7 +25,7 @@ func NewStringOption(title string, code string) *StringOption {
 	}
 }
 
-func (this *StringOption) AsHTML() string {
+func (this *TextField) AsHTML() string {
 	attrs := map[string]string{}
 	if this.MaxLength > 0 {
 		attrs["maxlength"] = fmt.Sprintf("%d", this.MaxLength)
@@ -46,7 +46,7 @@ func (this *StringOption) AsHTML() string {
 	}
 }
 
-func (this *StringOption) ApplyRequest(req *http.Request) (value interface{}, skip bool, err error) {
+func (this *TextField) ApplyRequest(req *http.Request) (value interface{}, skip bool, err error) {
 	value = req.Form.Get(this.Namespace + "_" + this.Code)
 	return value, false, nil
 }

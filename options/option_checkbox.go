@@ -5,15 +5,15 @@ import (
 	"net/http"
 )
 
-type BoolOption struct {
+type Checkbox struct {
 	Option
 
 	IsChecked bool   `yaml:"isChecked" json:"isChecked"`
 	Label     string `yaml:"label" json:"label"`
 }
 
-func NewBoolOption(title string, code string) *BoolOption {
-	return &BoolOption{
+func NewCheckbox(title string, code string) *Checkbox {
+	return &Checkbox{
 		Option: Option{
 			Type:  "bool",
 			Title: title,
@@ -22,7 +22,7 @@ func NewBoolOption(title string, code string) *BoolOption {
 	}
 }
 
-func (this *BoolOption) AsHTML() string {
+func (this *Checkbox) AsHTML() string {
 	attrs := map[string]string{
 		"name": this.Namespace + "_" + this.Code,
 	}
@@ -38,7 +38,7 @@ func (this *BoolOption) AsHTML() string {
 `
 }
 
-func (this *BoolOption) ApplyRequest(req *http.Request) (value interface{}, skip bool, err error) {
+func (this *Checkbox) ApplyRequest(req *http.Request) (value interface{}, skip bool, err error) {
 	value = req.Form.Get(this.Namespace + "_" + this.Code)
 	return value, false, nil
 }

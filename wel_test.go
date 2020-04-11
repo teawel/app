@@ -50,13 +50,13 @@ func TestWelCommandOptions(t *testing.T) {
 	wel.Site = "http://wel.teaos.cn"
 	wel.Developer = "TeaOS"
 	{
-		opt := options.NewStringOption("Host", "host")
+		opt := options.NewTextField("Host", "host")
 		opt.Description = "please input the MySQL server host"
 		wel.AddOption(opt)
 	}
 
 	{
-		opt := options.NewStringOption("Port", "port")
+		opt := options.NewTextField("Port", "port")
 		opt.Description = "please input the MySQL server port"
 		wel.AddOption(opt)
 	}
@@ -93,13 +93,13 @@ func TestWelCommandFetch(t *testing.T) {
 	wel.Site = "http://wel.teaos.cn"
 	wel.Developer = "TeaOS"
 	{
-		opt := options.NewStringOption("Host", "host")
+		opt := options.NewTextField("Host", "host")
 		opt.Description = "please input the MySQL server host"
 		wel.AddOption(opt)
 	}
 
 	{
-		opt := options.NewStringOption("Port", "port")
+		opt := options.NewTextField("Port", "port")
 		opt.Description = "please input the MySQL server port"
 		wel.AddOption(opt)
 	}
@@ -158,13 +158,13 @@ func TestWelCommandServe(t *testing.T) {
 		wel.AddOperation(op)
 	}
 	{
-		opt := options.NewStringOption("Host", "host")
+		opt := options.NewTextField("Host", "host")
 		opt.Description = "please input the MySQL server host"
 		wel.AddOption(opt)
 	}
 
 	{
-		opt := options.NewStringOption("Port", "port")
+		opt := options.NewTextField("Port", "port")
 		opt.Description = "please input the MySQL server port"
 		wel.AddOption(opt)
 	}
@@ -242,14 +242,14 @@ func TestWel_ServeHTTP(t *testing.T) {
 	}
 
 	{
-		opt := options.NewStringOption("Host", "host")
+		opt := options.NewTextField("Host", "host")
 		opt.Description = "please input the MySQL server host"
 		opt.Placeholder = "127.0.0.1"
 		wel.AddOption(opt)
 	}
 
 	{
-		opt := options.NewStringOption("Port", "port")
+		opt := options.NewTextField("Port", "port")
 		opt.Description = "please input the MySQL server port"
 		opt.Placeholder = "3306"
 		opt.Subtitle = "3306"
@@ -713,8 +713,8 @@ func TestWel_Export(t *testing.T) {
 	wel := NewWel()
 	wel.Id = "mysql"
 	wel.Version = "1.0"
-	wel.AddOption(options.NewStringOption("Host", "host"))
-	wel.AddOption(options.NewStringOption("Port", "port"))
+	wel.AddOption(options.NewTextField("Host", "host"))
+	wel.AddOption(options.NewTextField("Port", "port"))
 	err := wel.RunCmd("export", []string{}, os.Stdout)
 	if err != nil {
 		t.Fatal(err)

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type MemoOption struct {
+type TextBox struct {
 	Option
 
 	MaxLength   int    `yaml:"maxLength" json:"maxLength"`
@@ -15,8 +15,8 @@ type MemoOption struct {
 	Rows        int    `yaml:"rows" json:"rows"`
 }
 
-func NewMemoOption(title string, code string) *MemoOption {
-	return &MemoOption{
+func NewTextBox(title string, code string) *TextBox {
+	return &TextBox{
 		Option: Option{
 			Type:  "memo",
 			Title: title,
@@ -25,7 +25,7 @@ func NewMemoOption(title string, code string) *MemoOption {
 	}
 }
 
-func (this *MemoOption) AsHTML() string {
+func (this *TextBox) AsHTML() string {
 	attrs := map[string]string{}
 	if this.MaxLength > 0 {
 		attrs["maxlength"] = fmt.Sprintf("%d", this.MaxLength)
@@ -49,7 +49,7 @@ func (this *MemoOption) AsHTML() string {
 	return `<textarea ` + this.ComposeAttrs(attrs) + `>` + valueString + `</textarea>`
 }
 
-func (this *MemoOption) ApplyRequest(req *http.Request) (value interface{}, skip bool, err error) {
+func (this *TextBox) ApplyRequest(req *http.Request) (value interface{}, skip bool, err error) {
 	value = req.Form.Get(this.Namespace + "_" + this.Code)
 	return value, false, nil
 }
