@@ -1,8 +1,6 @@
 package options
 
 import (
-	"github.com/teawel/app/types"
-	"html"
 	"net/http"
 )
 
@@ -34,21 +32,7 @@ func (this *Options) AddValue(text string, value string) {
 	})
 }
 
-func (this *Options) AsHTML() string {
-	this.Attr("name", this.Namespace+"_"+this.Code)
-	result := `<select ` + this.ComposeAttrs(this.Attrs) + ` class="ui dropdown">` + "\n"
-	for _, o := range this.Values {
-		result += `<option value="` + html.EscapeString(o.Value) + `"`
-		if o.Value == types.String(this.Value) {
-			result += ` selected="selected"`
-		}
-		result += ">" + html.EscapeString(o.Text) + `</option>` + "\n"
-	}
-	result += "</select>"
-	return result
-}
-
 func (this *Options) ApplyRequest(req *http.Request) (value interface{}, skip bool, err error) {
-	value = req.Form.Get(this.Namespace + "_" + this.Code)
+	value = req.Form.Get(this.Code)
 	return value, false, nil
 }

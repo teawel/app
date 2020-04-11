@@ -1,7 +1,6 @@
 package options
 
 import (
-	"github.com/teawel/app/types"
 	"net/http"
 )
 
@@ -22,23 +21,7 @@ func NewCheckbox(title string, code string) *Checkbox {
 	}
 }
 
-func (this *Checkbox) AsHTML() string {
-	attrs := map[string]string{
-		"name": this.Namespace + "_" + this.Code,
-	}
-	if this.IsChecked {
-		attrs["checked"] = "checked"
-	}
-	attrs["value"] = types.String(this.Value)
-	return `
-<div class="ui checkbox">
-<input type="checkbox"` + this.ComposeAttrs(attrs) + `/>
-<label>` + this.Label + `</label>
-</div>
-`
-}
-
 func (this *Checkbox) ApplyRequest(req *http.Request) (value interface{}, skip bool, err error) {
-	value = req.Form.Get(this.Namespace + "_" + this.Code)
+	value = req.Form.Get(this.Code)
 	return value, false, nil
 }
